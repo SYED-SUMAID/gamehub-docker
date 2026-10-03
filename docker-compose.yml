@@ -1,0 +1,35 @@
+services:
+
+  apache:
+    build:
+      context: ./apache
+      dockerfile: Dockerfile
+    container_name: gamehub-apache
+    ports:
+      - "8097:80"
+    env_file:
+      - .env
+    volumes:
+      - ./apache:/var/www/html
+    networks:
+      - gamehub-network
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    container_name: gamehub-postgres
+    env_file:
+      - .env
+    volumes:
+      - gamehub_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - gamehub-network
+
+volumes:
+  gamehub_data:
+
+networks:
+  gamehub-network:
+    driver: bridge
